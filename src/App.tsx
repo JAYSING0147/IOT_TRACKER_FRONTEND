@@ -41,7 +41,7 @@ function App() {
           onSelectDevice={setSelectedDeviceId}
         />
       ) : (
-        <InsightsView />
+        <InsightsView devices={devices} />
       )}
     </div>
   );

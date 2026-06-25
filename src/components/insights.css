@@ -90,6 +90,170 @@
   width: 100%;
 }
 
+/* Clickable KPI Card */
+.kpi-card.clickable {
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.kpi-card.clickable:hover {
+  background: var(--bg-glass-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.1);
+  border-color: var(--accent-green);
+}
+
+.click-hint {
+  font-size: 0.72rem;
+  color: var(--accent-green);
+  margin-top: 6px;
+  font-weight: 600;
+  opacity: 0.8;
+  display: block;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.modal-content {
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.85);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-right: -4px;
+}
+
+.no-devices {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 32px 0;
+}
+
+.active-devices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.active-device-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  transition: var(--transition);
+}
+
+.active-device-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateX(3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.device-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dev-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.dev-id {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+.status-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.status-pill.active {
+  background: var(--accent-green-light);
+  color: var(--accent-green);
+}
+
+.status-pill.offline {
+  background: var(--accent-red-light);
+  color: var(--accent-red);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* Mobile Responsiveness for Insights */
 @media (max-width: 768px) {
   .insights-container {
@@ -136,5 +300,23 @@
 
   .chart-wrapper {
     height: 220px;
+  }
+
+  /* Modal responsive tweaks */
+  .modal-content {
+    padding: 16px;
+    max-height: 85vh;
+  }
+
+  .modal-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .active-device-item {
+    padding: 10px 12px;
+  }
+
+  .dev-name {
+    font-size: 0.9rem;
   }
 }

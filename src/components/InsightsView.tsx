@@ -2,16 +2,29 @@ import { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, Clock, Calendar } from 'lucide-react';
 import './insights.css'; // Import the new custom Vanilla CSS
+import type { DeviceInfo } from '../types';
 
 const BASE_URL = 'https://iot-tracker-backend.onrender.com/api/insights';
 
-export function InsightsView() {
-  const [dailyActive, setDailyActive] = useState(0);
+interface InsightsViewProps {
+  devices?: DeviceInfo[];
+}
+
+export function InsightsView({ devices = [] }: InsightsViewProps) {
+  const [dailyActiveCount, setDailyActiveCount] = useState(0);
+  const [activeDeviceIds, setActiveDeviceIds] = useState<string[]>([]);
   const [hourlyData, setHourlyData] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [showActiveList, setShowActiveList] = useState(false);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/daily`).then(r => r.json()).then(d => setDailyActive(d.totalActiveToday || 0)).catch(()=>null);
+    fetch(`${BASE_URL}/daily`)
+      .then(r => r.json())
+      .then(d => {
+        setDailyActiveCount(d.totalActiveToday || 0);
+        setActiveDeviceIds(d.activeDevices || []);
+      })
+      .catch(()=>null);
     fetch(`${BASE_URL}/hourly`).then(r => r.json()).then(d => setHourlyData(d)).catch(()=>null);
     fetch(`${BASE_URL}/weekly`).then(r => r.json()).then(d => setWeeklyData(d)).catch(()=>null);
   }, []);
@@ -22,13 +35,14 @@ export function InsightsView() {
       
       {/* KPI Cards */}
       <div className="kpi-grid">
-        <div className="kpi-card">
+        <div className="kpi-card clickable" onClick={() => setShowActiveList(true)}>
           <div className="kpi-icon-wrapper emerald">
             <Activity size={28} />
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Active Today</p>
-            <p className="kpi-value">{dailyActive} Devices</p>
+            <p className="kpi-value">{dailyActiveCount} Devices</p>
+            <span className="click-hint">Click to view details</span>
           </div>
         </div>
         
@@ -99,6 +113,39 @@ export function InsightsView() {
           </div>
         </div>
       </div>
+
+      {showActiveList && (
+        <div className="modal-overlay" onClick={() => setShowActiveList(false)}>
+          <div className="modal-content glass" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Active Devices Today</h2>
+              <button className="close-btn" onClick={() => setShowActiveList(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {activeDeviceIds.length === 0 ? (
+                <p className="no-devices">No devices recorded active today.</p>
+              ) : (
+                <div className="active-devices-list">
+                  {activeDeviceIds.map(id => {
+                    const dev = devices.find(d => d.deviceId === id);
+                    return (
+                      <div key={id} className="active-device-item">
+                        <div className="device-info">
+                          <span className="dev-name">{dev ? dev.customerName : 'Unknown Device'}</span>
+                          <span className="dev-id">{id}</span>
+                        </div>
+                        <span className={`status-pill ${dev?.status === 'ACTIVE' ? 'active' : 'offline'}`}>
+                          {dev?.status || 'OFFLINE'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

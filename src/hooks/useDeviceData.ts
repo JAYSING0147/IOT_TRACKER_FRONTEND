@@ -1,0 +1,75 @@
+import { useState, useEffect, useCallback } from 'react';
+import Papa from 'papaparse';
+import type { DeviceInfo } from '../types';
+
+const MOCK_CSV_DATA = `Customer Name,Address,Device ID,Latitude,Longitude
+John Doe,123 Green St,DEV-001,20.5937,78.9629
+Alice Smith,456 Agro Ln,DEV-002,21.1458,79.0882
+John Doe,123 Green St,DEV-001,20.5937,78.9629
+Bob Johnson,789 Farm Rd,DEV-003,19.0760,72.8777
+Priya Patel,101 MG Road,DEV-004,22.3094,72.1362
+Rahul Sharma,404 Cyber City,DEV-005,28.4595,77.0266`;
+
+export function useDeviceData(csvUrl?: string) {
+  const [devices, setDevices] = useState<DeviceInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const parseData = (csvText: string) => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const uniqueDevices = new Map<string, DeviceInfo>();
+          
+          results.data.forEach((row: any) => {
+            const deviceId = row['Device ID']?.trim();
+            if (deviceId && !uniqueDevices.has(deviceId)) {
+              uniqueDevices.set(deviceId, {
+                deviceId,
+                customerName: row['Name'] || row['Customer Name'] || 'Unknown',
+                address: row['Address'] || 'Unknown',
+                lat: parseFloat(row['Latitude']) || (20.5937 + (Math.random() - 0.5) * 5),
+                lng: parseFloat(row['Longitude']) || (78.9629 + (Math.random() - 0.5) * 5),
+                status: 'OFFLINE',
+              });
+            }
+          });
+
+          setDevices(Array.from(uniqueDevices.values()));
+          setLoading(false);
+        }
+      });
+    };
+
+    if (csvUrl) {
+      fetch(csvUrl)
+        .then(res => res.text())
+        .then(parseData)
+        .catch(err => {
+          console.error('Failed to fetch CSV, using mock data fallback', err);
+          parseData(MOCK_CSV_DATA);
+        });
+    } else {
+      parseData(MOCK_CSV_DATA);
+    }
+  }, [csvUrl]);
+
+  const updateDeviceLocation = useCallback((deviceId: string, lat: number, lng: number) => {
+    setDevices(prev => 
+      prev.map(d => d.deviceId === deviceId ? { ...d, lat, lng } : d)
+    );
+  }, []);
+
+  const updateDeviceStatus = useCallback((deviceId: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number) => {
+    setDevices(prev => {
+      // Only update if status or lastSeen changed for the device
+      const device = prev.find(d => d.deviceId === deviceId);
+      if (device && device.status === status && device.lastSeen === lastSeen) return prev;
+      
+      return prev.map(d => d.deviceId === deviceId ? { ...d, status, lastSeen } : d);
+    });
+  }, []);
+
+  return { devices, loading, updateDeviceLocation, updateDeviceStatus };
+}

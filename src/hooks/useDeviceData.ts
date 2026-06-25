@@ -63,13 +63,26 @@ export function useDeviceData(csvUrl?: string) {
 
   const updateDeviceStatus = useCallback((deviceId: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number) => {
     setDevices(prev => {
-      // Only update if status or lastSeen changed for the device
       const device = prev.find(d => d.deviceId === deviceId);
-      if (device && device.status === status && device.lastSeen === lastSeen) return prev;
-      
-      return prev.map(d => d.deviceId === deviceId ? { ...d, status, lastSeen } : d);
+      if (device) {
+        if (device.status === status && device.lastSeen === lastSeen) return prev;
+        return prev.map(d => d.deviceId === deviceId ? { ...d, status, lastSeen } : d);
+      } else {
+        if (loading) return prev;
+        // Device exists in backend DB but not in CSV, add it as a placeholder
+        const newDevice: DeviceInfo = {
+          deviceId,
+          customerName: 'Unknown Device',
+          address: 'Not Registered in Sheet',
+          lat: 20.5937,
+          lng: 78.9629,
+          status,
+          lastSeen
+        };
+        return [...prev, newDevice];
+      }
     });
-  }, []);
+  }, [loading]);
 
   return { devices, loading, updateDeviceLocation, updateDeviceStatus };
 }

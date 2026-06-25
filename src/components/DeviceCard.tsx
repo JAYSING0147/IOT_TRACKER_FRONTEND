@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import type { DeviceInfo } from '../types';
-import { MapPin, Hash } from 'lucide-react';
+import { MapPin, Hash, Clock } from 'lucide-react';
+
+const formatLastSeen = (timestamp?: number) => {
+  if (!timestamp) return 'Never';
+  return new Date(timestamp).toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+};
 
 interface DeviceCardProps {
   device: DeviceInfo;
@@ -55,6 +67,11 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
       <div className="device-address">
         <MapPin size={14} style={{ flexShrink: 0, marginTop: '2px' }}/>
         <span>{device.address}</span>
+      </div>
+      
+      <div className="device-last-seen" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <Clock size={12} style={{ flexShrink: 0 }} />
+        <span>Last Active: {formatLastSeen(device.lastSeen)}</span>
       </div>
 
       {isSelected && (

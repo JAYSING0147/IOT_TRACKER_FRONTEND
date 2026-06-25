@@ -6,6 +6,18 @@ import type { DeviceInfo } from '../types';
 
 const BASE_URL = 'https://iot-tracker-backend.onrender.com/api/insights';
 
+const formatLastSeen = (timestamp?: number) => {
+  if (!timestamp) return 'Never';
+  return new Date(timestamp).toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
 interface InsightsViewProps {
   devices?: DeviceInfo[];
 }
@@ -133,6 +145,12 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
                         <div className="device-info">
                           <span className="dev-name">{dev ? dev.customerName : 'Unknown Device'}</span>
                           <span className="dev-id">{id}</span>
+                          {dev?.lastSeen && (
+                            <span className="dev-last-seen" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                              <Clock size={10} />
+                              Last Active: {formatLastSeen(dev.lastSeen)}
+                            </span>
+                          )}
                         </div>
                         <span className={`status-pill ${dev?.status === 'ACTIVE' ? 'active' : 'offline'}`}>
                           {dev?.status || 'OFFLINE'}

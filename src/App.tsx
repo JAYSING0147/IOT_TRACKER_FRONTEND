@@ -4,6 +4,7 @@ import { useBackendStatus } from './hooks/useBackendStatus';
 import { Sidebar } from './components/Sidebar';
 import { MapView } from './components/Map';
 import { InsightsView } from './components/InsightsView';
+import { DeviceDetailsView } from './components/DeviceDetailsView';
 
 function App() {
   // Pass a CSV URL here if you want to load from a public sheet/CSV instead of mock
@@ -30,16 +31,24 @@ function App() {
         devices={devices} 
         selectedDeviceId={selectedDeviceId}
         onSelectDevice={setSelectedDeviceId}
-        onUpdateLocation={updateDeviceLocation}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
       {activeTab === 'map' ? (
-        <MapView 
-          devices={devices}
-          selectedDeviceId={selectedDeviceId}
-          onSelectDevice={setSelectedDeviceId}
-        />
+        selectedDeviceId ? (
+          <DeviceDetailsView 
+            deviceId={selectedDeviceId}
+            devices={devices}
+            onBack={() => setSelectedDeviceId(null)}
+            onUpdateLocation={updateDeviceLocation}
+          />
+        ) : (
+          <MapView 
+            devices={devices}
+            selectedDeviceId={selectedDeviceId}
+            onSelectDevice={setSelectedDeviceId}
+          />
+        )
       ) : (
         <InsightsView devices={devices} />
       )}

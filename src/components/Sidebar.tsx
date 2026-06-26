@@ -7,7 +7,6 @@ interface SidebarProps {
   devices: DeviceInfo[];
   selectedDeviceId: string | null;
   onSelectDevice: (id: string) => void;
-  onUpdateLocation: (id: string, lat: number, lng: number) => void;
   activeTab: 'map' | 'insights';
   onTabChange: (tab: 'map' | 'insights') => void;
 }
@@ -16,7 +15,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   devices,
   selectedDeviceId,
   onSelectDevice,
-  onUpdateLocation,
   activeTab,
   onTabChange
 }) => {
@@ -45,7 +43,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               device={device}
               isSelected={device.deviceId === selectedDeviceId}
               onSelect={onSelectDevice}
-              onUpdateLocation={onUpdateLocation}
             />
           ))}
         </div>

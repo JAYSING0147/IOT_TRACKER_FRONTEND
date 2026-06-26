@@ -528,6 +528,130 @@ body {
   color: var(--text-secondary);
 }
 
+/* Device Details View */
+.details-view-container {
+  flex: 1;
+  height: 100%;
+  padding: 32px;
+  overflow-y: auto;
+  background-color: var(--bg-main);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.details-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 8px 12px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.details-back-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  transform: translateX(-3px);
+}
+
+.details-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 20px;
+}
+
+.details-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.details-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.details-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  flex: 1;
+}
+
+.details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.details-card {
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.details-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 8px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 100px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.chart-pie-container {
+  height: 200px;
+  width: 100%;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   #root {
@@ -662,6 +786,25 @@ body {
   }
 
   .timeline-time {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  /* Device Details View Mobile Overrides */
+  .details-view-container {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .details-title {
+    font-size: 1.5rem;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .details-card {
+    padding: 16px;
   }
 }

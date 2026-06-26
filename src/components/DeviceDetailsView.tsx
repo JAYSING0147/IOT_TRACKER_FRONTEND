@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { ArrowLeft, MapPin, Hash, Clock, Navigation, Save } from 'lucide-react';
+import { ArrowLeft, MapPin, Hash, Clock, Navigation, Save, Phone } from 'lucide-react';
 import type { DeviceInfo } from '../types';
 
 interface DeviceDetailsProps {
@@ -229,6 +229,16 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
             <div className="info-row">
               <span className="info-label"><Clock size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Last Active</span>
               <span className="info-value">{formatLastSeen(device.lastSeen)}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label"><Phone size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Phone</span>
+              <span className="info-value">
+                {device.phoneNumber && device.phoneNumber !== 'N/A' ? (
+                  <a href={`tel:${device.phoneNumber}`} style={{ color: 'var(--accent-green)', textDecoration: 'none', fontWeight: 600 }}>
+                    {device.phoneNumber}
+                  </a>
+                ) : 'N/A'}
+              </span>
             </div>
           </div>
 

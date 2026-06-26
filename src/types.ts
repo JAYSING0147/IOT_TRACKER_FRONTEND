@@ -6,4 +6,5 @@ export interface DeviceInfo {
   lng: number;
   status: 'ACTIVE' | 'OFFLINE';
   lastSeen?: number;
+  phoneNumber?: string;
 }

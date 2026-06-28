@@ -17,28 +17,37 @@ interface TimelineInterval {
   isCurrent: boolean;
 }
 
-const getStartOfISTDay = () => {
+const getTodayISTString = () => {
+  const now = new Date();
   const offset = 5.5 * 60 * 60 * 1000;
-  const utcNow = Date.now();
-  const istNowTime = utcNow + offset;
-  const istStartOfDayTime = new Date(istNowTime).setUTCHours(0, 0, 0, 0);
-  return istStartOfDayTime - offset;
+  const istTime = new Date(now.getTime() + offset);
+  return istTime.toISOString().split('T')[0];
 };
 
 const buildTimeline = (
   logs: Array<{ event: 'ONLINE' | 'OFFLINE'; timestamp: string }>,
-  currentStatus: 'ACTIVE' | 'OFFLINE'
+  currentStatus: 'ACTIVE' | 'OFFLINE',
+  selectedDateStr: string
 ): TimelineInterval[] => {
-  const startOfDay = new Date(getStartOfISTDay());
+  const parts = selectedDateStr.split('-');
+  const istYear = parseInt(parts[0]);
+  const istMonth = parseInt(parts[1]) - 1;
+  const istDay = parseInt(parts[2]);
+  const targetDate = new Date(Date.UTC(istYear, istMonth, istDay));
+  
+  const startOfDay = new Date(targetDate.getTime() - (5.5 * 60 * 60 * 1000));
+  const endOfDay = new Date(startOfDay.getTime() + (24 * 60 * 60 * 1000));
+  
   const now = new Date();
+  const timelineEnd = endOfDay < now ? endOfDay : now;
   const intervals: TimelineInterval[] = [];
 
   if (logs.length === 0) {
     intervals.push({
       status: currentStatus,
       start: startOfDay,
-      end: now,
-      isCurrent: true
+      end: timelineEnd,
+      isCurrent: endOfDay >= now
     });
     return intervals;
   }
@@ -64,8 +73,8 @@ const buildTimeline = (
   intervals.push({
     status: currentState,
     start: currentPos,
-    end: now,
-    isCurrent: true
+    end: timelineEnd,
+    isCurrent: endOfDay >= now
   });
 
   return intervals;
@@ -113,6 +122,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
 }) => {
   const device = devices.find(d => d.deviceId === deviceId);
 
+  const [selectedDate, setSelectedDate] = useState(getTodayISTString());
   const [editLat, setEditLat] = useState(device?.lat.toString() || '');
   const [editLng, setEditLng] = useState(device?.lng.toString() || '');
   const [logs, setLogs] = useState<Array<{ event: 'ONLINE' | 'OFFLINE'; timestamp: string }>>([]);
@@ -127,7 +137,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
     }
   }, [device?.lat, device?.lng]);
 
-  // Fetch daily logs
+  // Fetch daily logs based on selectedDate
   useEffect(() => {
     if (!deviceId) return;
 
@@ -135,7 +145,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
       setLoadingLogs(true);
       setLogsError(null);
       try {
-        const res = await fetch(`https://iot-tracker-backend.onrender.com/api/devices/${deviceId}/logs`);
+        const res = await fetch(`https://iot-tracker-backend.onrender.com/api/devices/${deviceId}/logs?date=${selectedDate}`);
         if (!res.ok) throw new Error('Failed to fetch timeline logs');
         const data = await res.json();
         setLogs(data);
@@ -147,7 +157,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
     };
 
     fetchLogs();
-  }, [deviceId, device?.status]);
+  }, [deviceId, selectedDate, device?.status]);
 
   if (!device) {
     return (
@@ -170,7 +180,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
   };
 
   // Uptime chart calculation
-  const timelineIntervals = buildTimeline(logs, device.status);
+  const timelineIntervals = buildTimeline(logs, device.status, selectedDate);
   
   let onlineMs = 0;
   let offlineMs = 0;
@@ -197,7 +207,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
         <ArrowLeft size={16} /> Back to Map
       </button>
 
-      <div className="details-header-section">
+      <div className="details-header-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="details-title-group">
           <h1 className="details-title">{device.customerName}</h1>
           <div className="details-subtitle">
@@ -205,11 +215,23 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
               <Hash size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }}/>
               {device.deviceId}
             </span>
+            {device.deviceId.startsWith('899110') && <span className="sim-badge airtel">Airtel</span>}
+            {device.deviceId.startsWith('899111') && <span className="sim-badge vi">VI</span>}
             <span className={`status-badge ${device.status.toLowerCase()}`}>
               <div className="status-dot"></div>
               {device.status}
             </span>
           </div>
+        </div>
+        <div className="date-picker-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Select Date:</label>
+          <input 
+            type="date" 
+            value={selectedDate} 
+            onChange={e => setSelectedDate(e.target.value)} 
+            max={getTodayISTString()}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', outline: 'none', fontSize: '0.9rem', fontWeight: 500 }}
+          />
         </div>
       </div>
 

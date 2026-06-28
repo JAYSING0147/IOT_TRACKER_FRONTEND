@@ -32,10 +32,14 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
     >
       <div className="device-header">
         <span className="device-title">{device.customerName}</span>
-        <span className={`status-badge ${device.status.toLowerCase()}`}>
-          <div className="status-dot"></div>
-          {device.status}
-        </span>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {device.deviceId.startsWith('899110') && <span className="sim-badge airtel">Airtel</span>}
+          {device.deviceId.startsWith('899111') && <span className="sim-badge vi">VI</span>}
+          <span className={`status-badge ${device.status.toLowerCase()}`}>
+            <div className="status-dot"></div>
+            {device.status}
+          </span>
+        </div>
       </div>
       
       <div className="device-id">

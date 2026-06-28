@@ -23,27 +23,49 @@ interface InsightsViewProps {
 }
 
 export function InsightsView({ devices = [] }: InsightsViewProps) {
+  const getTodayISTString = () => {
+    const now = new Date();
+    const offset = 5.5 * 60 * 60 * 1000;
+    const istTime = new Date(now.getTime() + offset);
+    return istTime.toISOString().split('T')[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getTodayISTString());
   const [dailyActiveCount, setDailyActiveCount] = useState(0);
   const [activeDeviceIds, setActiveDeviceIds] = useState<string[]>([]);
   const [hourlyData, setHourlyData] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [showActiveList, setShowActiveList] = useState(false);
+  const [simAnalysis, setSimAnalysis] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/daily`)
+    fetch(`${BASE_URL}/daily?date=${selectedDate}`)
       .then(r => r.json())
       .then(d => {
         setDailyActiveCount(d.totalActiveToday || 0);
         setActiveDeviceIds(d.activeDevices || []);
+        setSimAnalysis(d.simAnalysis || null);
       })
       .catch(()=>null);
-    fetch(`${BASE_URL}/hourly`).then(r => r.json()).then(d => setHourlyData(d)).catch(()=>null);
-    fetch(`${BASE_URL}/weekly`).then(r => r.json()).then(d => setWeeklyData(d)).catch(()=>null);
-  }, []);
+    fetch(`${BASE_URL}/hourly?date=${selectedDate}`).then(r => r.json()).then(d => setHourlyData(d)).catch(()=>null);
+    fetch(`${BASE_URL}/weekly?date=${selectedDate}`).then(r => r.json()).then(d => setWeeklyData(d)).catch(()=>null);
+  }, [selectedDate]);
 
   return (
     <div className="insights-container">
-      <h1 className="insights-header">Analytics & Insights</h1>
+      <div className="insights-header-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <h1 className="insights-header" style={{ margin: 0 }}>Analytics & Insights</h1>
+        <div className="date-picker-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Select Date:</label>
+          <input 
+            type="date" 
+            value={selectedDate} 
+            onChange={e => setSelectedDate(e.target.value)} 
+            max={getTodayISTString()}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', outline: 'none', fontSize: '0.9rem', fontWeight: 500 }}
+          />
+        </div>
+      </div>
       
       {/* KPI Cards */}
       <div className="kpi-grid">
@@ -86,6 +108,43 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
           </div>
         </div>
       </div>
+
+      {simAnalysis && (
+        <div className="details-card" style={{ marginBottom: '32px', background: 'rgba(255, 255, 255, 0.8)', padding: '24px', borderRadius: 'var(--border-radius)' }}>
+          <h2 className="chart-title" style={{ marginBottom: '20px' }}>SIM Uptime Performance Analysis</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }} className="sim-analysis-grid">
+            {/* Airtel Performance */}
+            <div style={{ background: 'rgba(255,255,255,0.4)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.6)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span className="sim-badge airtel" style={{ fontSize: '0.8rem' }}>Airtel</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{simAnalysis.airtel.deviceCount} Devices</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '12px' }}>
+                <span style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{simAnalysis.airtel.uptimePercent}%</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Average Uptime</span>
+              </div>
+              <div style={{ width: '100%', height: '8px', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: `${simAnalysis.airtel.uptimePercent}%`, height: '100%', backgroundColor: '#ef4444', borderRadius: '4px' }}></div>
+              </div>
+            </div>
+
+            {/* VI Performance */}
+            <div style={{ background: 'rgba(255,255,255,0.4)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.6)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span className="sim-badge vi" style={{ fontSize: '0.8rem' }}>VI</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{simAnalysis.vi.deviceCount} Devices</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '12px' }}>
+                <span style={{ fontSize: '2rem', fontWeight: 800, color: '#7c3aed' }}>{simAnalysis.vi.uptimePercent}%</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Average Uptime</span>
+              </div>
+              <div style={{ width: '100%', height: '8px', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: `${simAnalysis.vi.uptimePercent}%`, height: '100%', backgroundColor: '#7c3aed', borderRadius: '4px' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="charts-grid">
         {/* Hourly Chart */}

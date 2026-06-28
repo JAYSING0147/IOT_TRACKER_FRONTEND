@@ -37,7 +37,7 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [showActiveList, setShowActiveList] = useState(false);
   const [simAnalysis, setSimAnalysis] = useState<any>(null);
-  const [rankings, setRankings] = useState<{ mostActive: any[], leastActive: any[] } | null>(null);
+  const [rankingsRaw, setRankingsRaw] = useState<Array<{ deviceId: string; uptimePercent: number }>>([]);
 
   useEffect(() => {
     fetch(`${BASE_URL}/daily?date=${selectedDate}`)
@@ -55,9 +55,32 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
   useEffect(() => {
     fetch(`${BASE_URL}/rankings`)
       .then(r => r.json())
-      .then(d => setRankings(d))
+      .then(d => {
+        if (Array.isArray(d)) {
+          setRankingsRaw(d);
+        }
+      })
       .catch(()=>null);
   }, []);
+
+  const mappedRankings = rankingsRaw.map(r => {
+    const dev = devices.find(d => d.deviceId === r.deviceId);
+    return {
+      deviceId: r.deviceId,
+      customerName: dev ? dev.customerName : 'Unknown Device',
+      uptimePercent: r.uptimePercent
+    };
+  });
+
+  const filteredRankings = mappedRankings.filter(r => 
+    r.customerName && 
+    r.customerName !== 'Unknown Device' && 
+    !r.customerName.toLowerCase().includes('unknown') && 
+    !r.deviceId.toLowerCase().includes('default')
+  );
+
+  const mostActive = [...filteredRankings].sort((a, b) => b.uptimePercent - a.uptimePercent).slice(0, 5);
+  const leastActive = [...filteredRankings].sort((a, b) => a.uptimePercent - b.uptimePercent).slice(0, 5);
 
   return (
     <div className="insights-container">
@@ -193,7 +216,7 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
         </div>
       </div>
 
-      {rankings && (
+      {filteredRankings.length > 0 && (
         <div className="rankings-section" style={{ marginTop: '32px', marginBottom: '32px' }}>
           <h2 className="chart-title" style={{ marginBottom: '20px' }}>Device Performance Rankings (All-Time)</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }} className="rankings-grid">
@@ -205,7 +228,7 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
                 Top Performing (Most Active)
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {rankings.mostActive.map((device, index) => (
+                {mostActive.map((device, index) => (
                   <div key={device.deviceId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.6)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -230,7 +253,7 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
                 Needs Attention (Least Active)
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {rankings.leastActive.map((device, index) => (
+                {leastActive.map((device, index) => (
                   <div key={device.deviceId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.6)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>

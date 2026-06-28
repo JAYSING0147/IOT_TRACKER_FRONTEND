@@ -37,6 +37,7 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [showActiveList, setShowActiveList] = useState(false);
   const [simAnalysis, setSimAnalysis] = useState<any>(null);
+  const [rankings, setRankings] = useState<{ mostActive: any[], leastActive: any[] } | null>(null);
 
   useEffect(() => {
     fetch(`${BASE_URL}/daily?date=${selectedDate}`)
@@ -50,6 +51,13 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
     fetch(`${BASE_URL}/hourly?date=${selectedDate}`).then(r => r.json()).then(d => setHourlyData(d)).catch(()=>null);
     fetch(`${BASE_URL}/weekly?date=${selectedDate}`).then(r => r.json()).then(d => setWeeklyData(d)).catch(()=>null);
   }, [selectedDate]);
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/rankings`)
+      .then(r => r.json())
+      .then(d => setRankings(d))
+      .catch(()=>null);
+  }, []);
 
   return (
     <div className="insights-container">
@@ -184,6 +192,65 @@ export function InsightsView({ devices = [] }: InsightsViewProps) {
           </div>
         </div>
       </div>
+
+      {rankings && (
+        <div className="rankings-section" style={{ marginTop: '32px', marginBottom: '32px' }}>
+          <h2 className="chart-title" style={{ marginBottom: '20px' }}>Device Performance Rankings (All-Time)</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }} className="rankings-grid">
+            
+            {/* Most Active Devices */}
+            <div className="details-card" style={{ background: 'rgba(255, 255, 255, 0.8)', padding: '24px', borderRadius: 'var(--border-radius)' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--accent-green)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--accent-green)' }}></span>
+                Top Performing (Most Active)
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {rankings.mostActive.map((device, index) => (
+                  <div key={device.deviceId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {index + 1}. {device.customerName}
+                      </span>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>{device.deviceId}</span>
+                        {device.deviceId.startsWith('899110') && <span className="sim-badge airtel" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>Airtel</span>}
+                        {device.deviceId.startsWith('899111') && <span className="sim-badge vi" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>VI</span>}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-green)' }}>{device.uptimePercent}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Least Active Devices */}
+            <div className="details-card" style={{ background: 'rgba(255, 255, 255, 0.8)', padding: '24px', borderRadius: 'var(--border-radius)' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--accent-red)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--accent-red)' }}></span>
+                Needs Attention (Least Active)
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {rankings.leastActive.map((device, index) => (
+                  <div key={device.deviceId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {index + 1}. {device.customerName}
+                      </span>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>{device.deviceId}</span>
+                        {device.deviceId.startsWith('899110') && <span className="sim-badge airtel" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>Airtel</span>}
+                        {device.deviceId.startsWith('899111') && <span className="sim-badge vi" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>VI</span>}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent-red)' }}>{device.uptimePercent}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {showActiveList && (
         <div className="modal-overlay" onClick={() => setShowActiveList(false)}>

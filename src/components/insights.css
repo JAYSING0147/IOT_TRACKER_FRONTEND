@@ -331,4 +331,9 @@
     grid-template-columns: 1fr !important;
     gap: 16px !important;
   }
+
+  .rankings-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
 }

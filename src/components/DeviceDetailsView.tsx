@@ -371,9 +371,9 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
               </div>
             )}
           </div>
-          {activeTab === 'settings' && (
+          <div className="details-card" style={{ marginTop: '20px' }}>
+            <h2 className="details-card-title">Device Settings</h2>
             <div className="device-settings fade-in">
-              <h3>Device Settings</h3>
               <div className="setting-item">
                 <div className="setting-info">
                   <h4>Alert Notifications</h4>
@@ -430,7 +430,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
               </div>
 
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

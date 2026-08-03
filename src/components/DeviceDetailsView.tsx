@@ -253,11 +253,11 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
               <span className="info-value">{formatLastSeen(device.lastSeen)}</span>
             </div>
             <div className="info-row">
-              <span className="info-label"><Phone size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Phone</span>
+              <span className="info-label"><Phone size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Owner / Password</span>
               <span className="info-value">
-                {device.phoneNumber && device.phoneNumber !== 'N/A' ? (
-                  <a href={`tel:${device.phoneNumber}`} style={{ color: 'var(--accent-green)', textDecoration: 'none', fontWeight: 600 }}>
-                    {device.phoneNumber}
+                {(device.ownerMobile || device.phoneNumber) && (device.ownerMobile || device.phoneNumber) !== 'N/A' ? (
+                  <a href={`tel:${device.ownerMobile || device.phoneNumber}`} style={{ color: 'var(--accent-green)', textDecoration: 'none', fontWeight: 600 }}>
+                    {device.ownerMobile || device.phoneNumber}
                   </a>
                 ) : 'N/A'}
               </span>

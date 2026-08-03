@@ -9,4 +9,5 @@ export interface DeviceInfo {
   phoneNumber?: string;
   subscriptionStatus?: 'PENDING' | 'ACTIVE' | 'EXPIRED';
   expiresAt?: string;
+  ownerMobile?: string;
 }

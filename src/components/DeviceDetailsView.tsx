@@ -145,7 +145,7 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
       setLoadingLogs(true);
       setLogsError(null);
       try {
-        const res = await fetch(`https://iot-tracker-backend.onrender.com/api/devices/${deviceId}/logs?date=${selectedDate}`);
+        const res = await fetch(`https://mqtt.agri-rana.in/api/devices/${deviceId}/logs?date=${selectedDate}`);
         if (!res.ok) throw new Error('Failed to fetch timeline logs');
         const data = await res.json();
         setLogs(data);

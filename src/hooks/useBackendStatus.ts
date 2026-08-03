@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 // Use localhost for local dev. Once deployed to Render, change this to your Render URL.
-const BACKEND_URL = 'https://iot-tracker-backend.onrender.com/api/devices';
+const BACKEND_URL = 'https://mqtt.agri-rana.in/api/devices';
 
 export function useBackendStatus(
   updateDeviceStatus: (id: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number) => void

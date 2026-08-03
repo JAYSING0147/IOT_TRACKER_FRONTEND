@@ -4,7 +4,7 @@ import { Activity, Clock, Calendar } from 'lucide-react';
 import './insights.css'; // Import the new custom Vanilla CSS
 import type { DeviceInfo } from '../types';
 
-const BASE_URL = 'https://iot-tracker-backend.onrender.com/api/insights';
+const BASE_URL = 'https://mqtt.agri-rana.in/api/insights';
 
 const formatLastSeen = (timestamp?: number) => {
   if (!timestamp) return 'Never';

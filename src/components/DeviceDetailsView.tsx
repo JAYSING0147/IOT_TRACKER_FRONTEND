@@ -371,6 +371,66 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
               </div>
             )}
           </div>
+          {activeTab === 'settings' && (
+            <div className="device-settings fade-in">
+              <h3>Device Settings</h3>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <h4>Alert Notifications</h4>
+                  <p>Receive push notifications when device goes offline</p>
+                </div>
+                <label className="toggle-switch">
+                  <input type="checkbox" defaultChecked />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <div className="setting-item">
+                <div className="setting-info">
+                  <h4>Auto-Refresh Interval</h4>
+                  <p>How often to fetch new data from the device</p>
+                </div>
+                <select className="select-input">
+                  <option>30 seconds</option>
+                  <option>1 minute</option>
+                  <option>5 minutes</option>
+                </select>
+              </div>
+              
+              {/* Reset Owner Section */}
+              <div className="setting-item">
+                <div className="setting-info">
+                  <h4>Reset Device Ownership</h4>
+                  <p>Wipe the current owner's mobile number so a new farmer can claim it.</p>
+                </div>
+                <button 
+                  className="reset-owner-button"
+                  onClick={async () => {
+                    if (window.confirm('Are you sure you want to wipe the ownership for this device?')) {
+                      try {
+                        const res = await fetch(`https://mqtt.agri-rana.in/api/reset-owner/${deviceId}`, { method: 'POST' });
+                        if (res.ok) alert('Device ownership wiped successfully!');
+                        else alert('Failed to wipe ownership.');
+                      } catch (err) {
+                        alert('Network error while resetting owner.');
+                      }
+                    }
+                  }}
+                  style={{
+                    background: '#ff4d4f',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}
+                >
+                  Wipe Owner
+                </button>
+              </div>
+
+            </div>
+          )}
         </div>
       </div>
     </div>

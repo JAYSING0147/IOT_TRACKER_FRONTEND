@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDeviceData } from './hooks/useDeviceData';
 import { useBackendStatus } from './hooks/useBackendStatus';
 import { Sidebar } from './components/Sidebar';
 import { MapView } from './components/Map';
 import { InsightsView } from './components/InsightsView';
 import { DeviceDetailsView } from './components/DeviceDetailsView';
+import { LoginScreen } from './components/LoginScreen';
 
 function App() {
   // Pass a CSV URL here if you want to load from a public sheet/CSV instead of mock
@@ -13,8 +14,25 @@ function App() {
   
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'map' | 'insights'>('map');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const authStatus = localStorage.getItem('iot_admin_auth');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    localStorage.setItem('iot_admin_auth', 'true');
+    setIsAuthenticated(true);
+  };
 
   useBackendStatus(updateDeviceStatus);
+
+  if (!isAuthenticated) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
 
   if (loading) {
     return (

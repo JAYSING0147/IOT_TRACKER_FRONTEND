@@ -7,4 +7,6 @@ export interface DeviceInfo {
   status: 'ACTIVE' | 'OFFLINE';
   lastSeen?: number;
   phoneNumber?: string;
+  subscriptionStatus?: 'PENDING' | 'ACTIVE' | 'EXPIRED';
+  expiresAt?: string;
 }

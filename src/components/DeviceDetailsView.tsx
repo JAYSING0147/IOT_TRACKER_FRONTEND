@@ -372,28 +372,25 @@ export const DeviceDetailsView: React.FC<DeviceDetailsProps> = ({
             )}
           </div>
           <div className="details-card" style={{ marginTop: '20px' }}>
-            <h2 className="details-card-title">Device Settings</h2>
+            <h2 className="details-card-title">Device Subscription</h2>
             <div className="device-settings fade-in">
               <div className="setting-item">
                 <div className="setting-info">
-                  <h4>Alert Notifications</h4>
-                  <p>Receive push notifications when device goes offline</p>
+                  <h4>Subscription Status</h4>
+                  <p>Current status of the farmer's 2-year trial</p>
                 </div>
-                <label className="toggle-switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider"></span>
-                </label>
+                <div style={{ fontWeight: 600, color: device.subscriptionStatus === 'ACTIVE' ? '#22c55e' : (device.subscriptionStatus === 'EXPIRED' ? '#ef4444' : '#f59e0b') }}>
+                  {device.subscriptionStatus || 'PENDING'}
+                </div>
               </div>
               <div className="setting-item">
                 <div className="setting-info">
-                  <h4>Auto-Refresh Interval</h4>
-                  <p>How often to fetch new data from the device</p>
+                  <h4>Expiry Date</h4>
+                  <p>When the subscription or trial ends</p>
                 </div>
-                <select className="select-input">
-                  <option>30 seconds</option>
-                  <option>1 minute</option>
-                  <option>5 minutes</option>
-                </select>
+                <div style={{ fontWeight: 600 }}>
+                  {device.expiresAt ? new Date(device.expiresAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' }) : 'Not Started'}
+                </div>
               </div>
               
               {/* Reset Owner Section */}

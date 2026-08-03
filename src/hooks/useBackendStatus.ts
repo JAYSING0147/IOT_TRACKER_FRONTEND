@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 const BACKEND_URL = 'https://mqtt.agri-rana.in/api/devices';
 
 export function useBackendStatus(
-  updateDeviceStatus: (id: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number) => void
+  updateDeviceStatus: (id: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number, subStatus: any, expires: any) => void
 ) {
   useEffect(() => {
     const fetchStatus = async () => {
@@ -17,7 +17,9 @@ export function useBackendStatus(
           updateDeviceStatus(
             dbDev.deviceId, 
             dbDev.status, 
-            new Date(dbDev.lastSeen).getTime()
+            new Date(dbDev.lastSeen).getTime(),
+            dbDev.subscriptionStatus,
+            dbDev.expiresAt
           );
         });
       } catch (err) {

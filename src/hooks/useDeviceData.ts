@@ -61,12 +61,12 @@ export function useDeviceData(csvUrl?: string) {
     );
   }, []);
 
-  const updateDeviceStatus = useCallback((deviceId: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number) => {
+  const updateDeviceStatus = useCallback((deviceId: string, status: 'ACTIVE' | 'OFFLINE', lastSeen: number, subStatus: any, expires: any) => {
     setDevices(prev => {
       const device = prev.find(d => d.deviceId === deviceId);
       if (device) {
-        if (device.status === status && device.lastSeen === lastSeen) return prev;
-        return prev.map(d => d.deviceId === deviceId ? { ...d, status, lastSeen } : d);
+        if (device.status === status && device.lastSeen === lastSeen && device.subscriptionStatus === subStatus && device.expiresAt === expires) return prev;
+        return prev.map(d => d.deviceId === deviceId ? { ...d, status, lastSeen, subscriptionStatus: subStatus, expiresAt: expires } : d);
       } else {
         if (loading) return prev;
         // Device exists in backend DB but not in CSV, add it as a placeholder
@@ -78,7 +78,9 @@ export function useDeviceData(csvUrl?: string) {
           lng: 78.9629,
           status,
           lastSeen,
-          phoneNumber: 'N/A'
+          phoneNumber: 'N/A',
+          subscriptionStatus: subStatus,
+          expiresAt: expires
         };
         return [...prev, newDevice];
       }

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { DeviceInfo } from '../types';
-import { MapPin, Hash, Clock } from 'lucide-react';
+import { MapPin, Hash, Clock, Phone } from 'lucide-react';
 
 const formatLastSeen = (timestamp?: number) => {
   if (!timestamp) return 'Never';
@@ -25,6 +25,8 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
   isSelected, 
   onSelect
 }) => {
+  const displayPhone = device.ownerMobile || device.phoneNumber;
+
   return (
     <div 
       className={`device-card ${isSelected ? 'selected' : ''}`}
@@ -46,6 +48,13 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
         <Hash size={12} style={{ display: 'inline', marginRight: '4px' }}/>
         {device.deviceId}
       </div>
+
+      {displayPhone && displayPhone !== 'N/A' && (
+        <div className="device-phone" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Phone size={12} style={{ flexShrink: 0 }} />
+          <span>{displayPhone}</span>
+        </div>
+      )}
       
       <div className="device-address">
         <MapPin size={14} style={{ flexShrink: 0, marginTop: '2px' }}/>
